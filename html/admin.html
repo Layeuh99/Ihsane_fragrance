@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Admin | Ihsane Fragrance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+  </head>
+  <body class="admin-body">
+    <div class="soft-noise" aria-hidden="true"></div>
+    <main class="admin-shell">
+      <div class="admin-top">
+        <a class="brand" href="index.html">
+          <span class="brand-mark"><img src="../images/logo/ihsane-logo.svg" alt="" aria-hidden="true"></span>
+          <span>Ihsane Fragrance</span>
+        </a>
+        <div class="admin-actions">
+          <button class="button ghost admin-logout" type="button" hidden>Déconnexion</button>
+          <a class="button secondary" href="index.html">Voir la boutique</a>
+        </div>
+      </div>
+
+      <section class="admin-login admin-panel" id="adminLogin">
+        <p class="eyebrow">Accès privé</p>
+        <h1>Connexion admin</h1>
+        <form class="product-form" id="loginForm">
+          <label class="field">
+            <span>Email</span>
+            <input name="email" type="email" required placeholder="votre@email.com" autocomplete="username">
+          </label>
+          <label class="field">
+            <span>Mot de passe</span>
+            <input name="password" type="password" required placeholder="Votre mot de passe" autocomplete="current-password">
+          </label>
+          <p class="login-error" id="loginError" role="alert"></p>
+          <button class="button primary" type="submit">Se connecter</button>
+        </form>
+      </section>
+
+      <section class="admin-grid admin-private" id="adminPrivate" hidden>
+        <div class="admin-panel">
+          <p class="eyebrow">Administration</p>
+          <h1>Produits</h1>
+          <form class="product-form" id="productForm">
+            <label class="field">
+              <span>Nom du produit</span>
+              <input name="name" required placeholder="Ex: Musc de Soie">
+            </label>
+            <label class="field">
+              <span>Catégorie</span>
+              <select name="category" required>
+                <option>Parfums</option>
+                <option>Huiles parfumées</option>
+                <option>Extraits</option>
+                <option>Brumes</option>
+                <option>Musc</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Prix FCFA</span>
+              <input name="price" required type="number" min="0" step="500" placeholder="12000">
+            </label>
+            <label class="field">
+              <span>Badge</span>
+              <input name="badge" placeholder="Promo, Nouveau, Best seller">
+            </label>
+            <label class="field">
+              <span>Image URL</span>
+              <input name="image" required placeholder="https://...">
+            </label>
+            <button class="button primary" type="submit">Ajouter le produit</button>
+            <button class="button ghost" type="button" id="resetProducts">Réinitialiser</button>
+          </form>
+        </div>
+
+        <div class="admin-panel">
+          <p class="eyebrow">Catalogue</p>
+          <h2>Produits affichés</h2>
+          <div class="admin-products" id="adminProducts"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="../js/script.js"></script>
+    <script src="../js/admin.js"></script>
+  </body>
+</html>
