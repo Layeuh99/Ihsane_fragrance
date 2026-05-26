@@ -1,73 +1,122 @@
 const DEFAULT_PRODUCTS = [
   {
-    id: "parfum-royal-oud",
-    name: "Royal Oud",
+    id: "parfum-al-saraha-blend",
+    name: "Al Saraha Blend",
     category: "Parfums",
     price: 18000,
     badge: "Best seller",
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=700&q=85",
+    image: "../images/produits/Parfums/Al-saraha-blend.jpeg",
   },
   {
-    id: "huile-ambre-doux",
-    name: "Ambre Doux",
+    id: "parfum-al-saraha-candys",
+    name: "Al Saraha Candys",
+    category: "Parfums",
+    price: 18000,
+    badge: "",
+    image: "../images/produits/Parfums/Al-saraha-candys.jpeg",
+  },
+  {
+    id: "parfum-al-saraha-pastiche",
+    name: "Al Saraha Pastiche",
+    category: "Parfums",
+    price: 18000,
+    badge: "",
+    image: "../images/produits/Parfums/Al-saraha-pastiche.jpeg",
+  },
+  {
+    id: "huile-ambroise-kim-k",
+    name: "Ambroise Kim K",
     category: "Huiles parfumées",
     price: 7000,
     badge: "",
-    image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=700&q=85",
+    image: "../images/produits/Huiles parfumées/Ambroise Kim K.jpeg",
   },
   {
-    id: "extrait-musc-blanc",
-    name: "Musc Blanc Intense",
-    category: "Extraits",
-    price: 12000,
+    id: "huile-bianco-latte",
+    name: "Bianco Latte Poussière d'Or Interdit Soft",
+    category: "Huiles parfumées",
+    price: 7500,
     badge: "Nouveau",
-    image: "https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&w=700&q=85",
+    image: "../images/produits/Huiles parfumées/Bianco latte Poussière d'or interdit Soft,Kayali 81 Hypnotic Candy love.jpeg",
   },
   {
-    id: "brume-rose-velours",
-    name: "Rose Velours",
-    category: "Brumes",
-    price: 8500,
-    badge: "",
-    image: "https://images.unsplash.com/photo-1595425964071-2c1ecb2c3b9d?auto=format&fit=crop&w=700&q=85",
-  },
-  {
-    id: "musc-soie",
-    name: "Musc de Soie",
-    category: "Musc",
-    price: 6500,
-    badge: "Promo",
-    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=700&q=85",
-  },
-  {
-    id: "parfum-nuit-doree",
-    name: "Nuit Dorée",
-    category: "Parfums",
-    price: 22000,
-    badge: "",
-    image: "https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?auto=format&fit=crop&w=700&q=85",
-  },
-  {
-    id: "huile-vanille-privee",
-    name: "Vanille Privée",
+    id: "huile-interdit-hypnotic",
+    name: "Interdit Hypnotic Poussière d'Or Scandale",
     category: "Huiles parfumées",
     price: 7500,
     badge: "",
-    image: "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&w=700&q=85",
+    image: "../images/produits/Huiles parfumées/Interdit Hypnotic Poussiere d'or scandale.jpeg",
   },
   {
-    id: "brume-coton-musc",
-    name: "Coton Musc",
-    category: "Brumes",
+    id: "huile-kayali-28",
+    name: "Kayali 28 Bianco Latte Ambroisie Scandale",
+    category: "Huiles parfumées",
     price: 8000,
+    badge: "",
+    image: "../images/produits/Huiles parfumées/Kayali 28 Bianco Latte Ambroisie Scandale.jpeg",
+  },
+  {
+    id: "huile-ambroise",
+    name: "Ambroise Huile Parfumée",
+    category: "Huiles parfumées",
+    price: 7000,
+    badge: "",
+    image: "../images/produits/Huiles parfumées/ambroise-huile-parfumee.jpeg",
+  },
+  {
+    id: "extrait-collection-kayali",
+    name: "Collection Kayali",
+    category: "Extraits",
+    price: 12000,
+    badge: "Premium",
+    image: "../images/produits/Extraits/collection-kayali.jpeg",
+  },
+  {
+    id: "extrait-femme-luxe",
+    name: "Extraits Femme Luxe",
+    category: "Extraits",
+    price: 12000,
+    badge: "",
+    image: "../images/produits/Extraits/extraits-femme-luxe.jpeg",
+  },
+  {
+    id: "extrait-kim-k-ambroise",
+    name: "Kim K vs Ambroise",
+    category: "Extraits",
+    price: 12000,
+    badge: "",
+    image: "../images/produits/Extraits/kim-k-vs-ambroise.jpeg",
+  },
+  {
+    id: "brume-parfumees-color",
+    name: "Brumes Parfumées Color",
+    category: "Brumes",
+    price: 8500,
+    badge: "",
+    image: "../images/produits/Brumes/brumes-parfumees-color.jpeg",
+  },
+  {
+    id: "musc-ambroisie",
+    name: "Musc Ambroisie",
+    category: "Musc",
+    price: 6500,
     badge: "Doux",
-    image: "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=700&q=85",
+    image: "../images/produits/Musc/musc-ambroisie.jpeg",
+  },
+  {
+    id: "musc-intime-premium",
+    name: "Musc Intime Premium",
+    category: "Musc",
+    price: 6500,
+    badge: "",
+    image: "../images/produits/Musc/musc-intime-premium.jpeg",
   },
 ];
 
 const PRODUCT_KEY = "ihsane_fragrance_products";
 const CART_KEY = "ihsane_fragrance_cart";
 const WHATSAPP_NUMBER = "221775714346";
+const PRODUCTS_VERSION = "v3_real_images_final";
 
 const money = new Intl.NumberFormat("fr-FR", {
   maximumFractionDigits: 0,
@@ -75,12 +124,21 @@ const money = new Intl.NumberFormat("fr-FR", {
 
 function getProducts() {
   const stored = localStorage.getItem(PRODUCT_KEY);
-  if (!stored) return DEFAULT_PRODUCTS;
+  const version = localStorage.getItem(PRODUCT_KEY + "_version");
+
+  // Forcer la réinitialisation si la version ne correspond pas
+  if (!stored || version !== PRODUCTS_VERSION) {
+    localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
+    localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+    return DEFAULT_PRODUCTS;
+  }
 
   try {
     const products = JSON.parse(stored);
     return Array.isArray(products) && products.length ? products : DEFAULT_PRODUCTS;
   } catch {
+    localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
+    localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
     return DEFAULT_PRODUCTS;
   }
 }
@@ -284,6 +342,10 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.14 });
 
 document.querySelectorAll("[data-reveal]").forEach((element) => revealObserver.observe(element));
+
+// Forcer le rechargement des produits avec les nouvelles images
+localStorage.removeItem(PRODUCT_KEY);
+localStorage.removeItem(PRODUCT_KEY + "_version");
 
 renderProducts();
 renderCart();

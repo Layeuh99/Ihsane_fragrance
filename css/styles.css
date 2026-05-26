@@ -1005,6 +1005,11 @@ h3 { color: var(--chocolate); font-size: 1.15rem; }
   border-radius: .75rem;
   object-fit: cover;
 }
+.admin-product-actions {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
 .admin-product button {
   border: 0;
   border-radius: 999px;
@@ -1012,6 +1017,14 @@ h3 { color: var(--chocolate); font-size: 1.15rem; }
   color: var(--white);
   background: var(--chocolate);
   cursor: pointer;
+  font-size: .85rem;
+  font-weight: 500;
+}
+.admin-product button.edit-btn {
+  background: var(--latte);
+}
+.admin-product button.delete-btn {
+  background: #9f2d2d;
 }
 
 @media (max-width: 980px) {
