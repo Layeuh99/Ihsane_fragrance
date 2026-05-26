@@ -249,9 +249,32 @@ if (productForm) {
       });
     }
 
-    // Sauvegarder uniquement dans localStorage
+    // Sauvegarder dans localStorage
     localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
     console.log('Produits sauvegardés dans localStorage');
+
+    // Sauvegarder sur le stockage externe si configuré (JSONBin.io) pour synchronisation entre utilisateurs
+    const externalStorageUrl = localStorage.getItem('ihsane_storage_url');
+    const externalStorageKey = localStorage.getItem('ihsane_storage_key');
+    if (externalStorageUrl && externalStorageKey) {
+      try {
+        const response = await fetch(externalStorageUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': externalStorageKey,
+          },
+          body: JSON.stringify(products),
+        });
+        if (response.ok) {
+          console.log('Produits sauvegardés sur le stockage externe');
+        } else {
+          console.error('Erreur lors de la sauvegarde sur le stockage externe');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde sur le stockage externe:', error);
+      }
+    }
 
     productForm.reset();
     handleImageSourceChange();
@@ -278,6 +301,28 @@ if (adminProducts) {
       products = products.filter((product) => product.id !== deleteButton.dataset.deleteProduct);
       localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
       console.log('Produit supprimé, sauvegardé dans localStorage');
+
+      // Sauvegarder sur le stockage externe si configuré
+      const externalStorageUrl = localStorage.getItem('ihsane_storage_url');
+      const externalStorageKey = localStorage.getItem('ihsane_storage_key');
+      if (externalStorageUrl && externalStorageKey) {
+        try {
+          const response = await fetch(externalStorageUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Master-Key': externalStorageKey,
+            },
+            body: JSON.stringify(products),
+          });
+          if (response.ok) {
+            console.log('Produits sauvegardés sur le stockage externe');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la sauvegarde sur le stockage externe:', error);
+        }
+      }
+
       await renderAdminProducts();
     }
 
@@ -385,9 +430,31 @@ if (importJSON && importFile) {
       const products = JSON.parse(text);
       if (!Array.isArray(products)) throw new Error("Format invalide");
 
-      // Sauvegarder uniquement dans localStorage
+      // Sauvegarder dans localStorage
       localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
       console.log('Produits importés, sauvegardés dans localStorage');
+
+      // Sauvegarder sur le stockage externe si configuré
+      const externalStorageUrl = localStorage.getItem('ihsane_storage_url');
+      const externalStorageKey = localStorage.getItem('ihsane_storage_key');
+      if (externalStorageUrl && externalStorageKey) {
+        try {
+          const response = await fetch(externalStorageUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Master-Key': externalStorageKey,
+            },
+            body: JSON.stringify(products),
+          });
+          if (response.ok) {
+            console.log('Produits sauvegardés sur le stockage externe');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la sauvegarde sur le stockage externe:', error);
+        }
+      }
+
       await renderAdminProducts();
       alert("Produits importés avec succès !");
     } catch (error) {
@@ -442,6 +509,14 @@ if (document.readyState === 'loading') {
   initLoginInterface();
   handleImageSourceChange();
 }
+
+// Écouter les changements de localStorage pour synchroniser entre onglets
+window.addEventListener('storage', (event) => {
+  if (event.key === PRODUCT_KEY && event.newValue) {
+    console.log('Changement détecté dans localStorage depuis un autre onglet');
+    renderAdminProducts();
+  }
+});
 
 if (imageSource) {
   imageSource.addEventListener("change", handleImageSourceChange);

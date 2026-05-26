@@ -12,21 +12,7 @@ const EXTERNAL_STORAGE_URL = localStorage.getItem('ihsane_storage_url') || '';
 const EXTERNAL_STORAGE_KEY = localStorage.getItem('ihsane_storage_key') || '';
 
 async function loadProductsFromJSON() {
-  // Priorité 1: localStorage (où l'admin sauvegarde)
-  const stored = localStorage.getItem(PRODUCT_KEY);
-  if (stored) {
-    try {
-      const products = JSON.parse(stored);
-      if (Array.isArray(products) && products.length) {
-        console.log('Produits chargés depuis localStorage');
-        return products;
-      }
-    } catch (e) {
-      console.error('Erreur lors de la lecture du localStorage:', e);
-    }
-  }
-
-  // Priorité 2: Stockage externe si configuré (JSONBin.io)
+  // Priorité 1: Stockage externe si configuré (JSONBin.io) - pour synchronisation entre utilisateurs
   if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
     try {
       const response = await fetch(EXTERNAL_STORAGE_URL, {
@@ -45,6 +31,20 @@ async function loadProductsFromJSON() {
       }
     } catch (error) {
       console.log('Impossible de charger depuis le stockage externe');
+    }
+  }
+
+  // Priorité 2: localStorage (où l'admin sauvegarde)
+  const stored = localStorage.getItem(PRODUCT_KEY);
+  if (stored) {
+    try {
+      const products = JSON.parse(stored);
+      if (Array.isArray(products) && products.length) {
+        console.log('Produits chargés depuis localStorage');
+        return products;
+      }
+    } catch (e) {
+      console.error('Erreur lors de la lecture du localStorage:', e);
     }
   }
 
@@ -332,3 +332,17 @@ if (document.readyState === 'loading') {
     await renderCart();
   })();
 }
+
+// Écouter les changements de localStorage pour synchroniser entre onglets
+window.addEventListener('storage', (event) => {
+  if (event.key === PRODUCT_KEY && event.newValue) {
+    console.log('Changement détecté dans localStorage depuis un autre onglet');
+    if (!document.body.classList.contains('admin-body')) {
+      renderProducts();
+    }
+  }
+  if (event.key === CART_KEY && event.newValue) {
+    console.log('Changement du panier détecté depuis un autre onglet');
+    renderCart();
+  }
+});
