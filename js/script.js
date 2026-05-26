@@ -116,7 +116,7 @@ const DEFAULT_PRODUCTS = [
 const PRODUCT_KEY = "ihsane_fragrance_products";
 const CART_KEY = "ihsane_fragrance_cart";
 const WHATSAPP_NUMBER = "221775714346";
-const PRODUCTS_VERSION = "v4_github_pages_paths";
+const PRODUCTS_VERSION = "v5_force_reload";
 
 const money = new Intl.NumberFormat("fr-FR", {
   maximumFractionDigits: 0,
