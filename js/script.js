@@ -150,21 +150,30 @@ async function loadProductsFromJSON() {
     }
   }
 
-  // Ne pas écraser le localStorage - utiliser ce qui existe ou DEFAULT_PRODUCTS
+  // Vérifier la version dans le localStorage
   const stored = localStorage.getItem(PRODUCT_KEY);
-  if (stored) {
-    try {
-      const products = JSON.parse(stored);
-      if (Array.isArray(products) && products.length) {
-        console.log('Utilisation des produits du localStorage');
-        return products;
-      }
-    } catch (e) {
-      // Si erreur, utiliser DEFAULT_PRODUCTS
-    }
+  const version = localStorage.getItem(PRODUCT_KEY + "_version");
+
+  // Si la version ne correspond pas, utiliser DEFAULT_PRODUCTS
+  if (!stored || version !== PRODUCTS_VERSION) {
+    console.log('Version changée ou localStorage vide, utilisation de DEFAULT_PRODUCTS');
+    localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
+    localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+    return DEFAULT_PRODUCTS;
   }
 
-  // Utiliser DEFAULT_PRODUCTS seulement si localStorage est vide
+  // Sinon utiliser le localStorage
+  try {
+    const products = JSON.parse(stored);
+    if (Array.isArray(products) && products.length) {
+      console.log('Utilisation des produits du localStorage');
+      return products;
+    }
+  } catch (e) {
+    // Si erreur, utiliser DEFAULT_PRODUCTS
+  }
+
+  // Utiliser DEFAULT_PRODUCTS en dernier recours
   console.log('Utilisation des produits par défaut avec vraies images');
   localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
   localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
@@ -405,14 +414,6 @@ document.querySelectorAll("[data-reveal]").forEach((element) => revealObserver.o
 
 // Initialisation async
 (async function init() {
-  // Nettoyer le localStorage seulement si la version a changé
-  const currentVersion = localStorage.getItem(PRODUCT_KEY + "_version");
-  if (currentVersion !== PRODUCTS_VERSION) {
-    console.log('Version changée, rechargement des produits...');
-    localStorage.removeItem(PRODUCT_KEY);
-    localStorage.removeItem(PRODUCT_KEY + "_version");
-  }
-
   console.log('Début du rendu des produits...');
   await renderProducts();
   console.log('Rendu des produits terminé');
