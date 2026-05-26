@@ -111,7 +111,30 @@ function slugify(value) {
 }
 
 async function renderAdminProducts() {
-  const products = await getProducts();
+  // Admin utilise uniquement localStorage pour éviter les dépendances externes
+  const stored = localStorage.getItem(PRODUCT_KEY);
+  let products = [];
+  if (stored) {
+    try {
+      products = JSON.parse(stored);
+    } catch (e) {
+      console.error('Erreur lors de la lecture du localStorage:', e);
+    }
+  }
+
+  // Si localStorage vide, charger depuis products.json
+  if (!products || products.length === 0) {
+    try {
+      const response = await fetch('../js/products.json');
+      if (response.ok) {
+        products = await response.json();
+        localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de products.json:', error);
+    }
+  }
+
   adminProducts.innerHTML = products.map((product) => `
     <article class="admin-product" data-product-id="${product.id}">
       <img src="${product.image}" alt="${product.name}">
@@ -156,7 +179,17 @@ if (productForm) {
     event.preventDefault();
     const data = new FormData(productForm);
     const name = data.get("name").trim();
-    const products = await getProducts();
+
+    // Charger les produits depuis localStorage
+    const stored = localStorage.getItem(PRODUCT_KEY);
+    let products = [];
+    if (stored) {
+      try {
+        products = JSON.parse(stored);
+      } catch (e) {
+        console.error('Erreur lors de la lecture du localStorage:', e);
+      }
+    }
 
     const submitButton = productForm.querySelector('button[type="submit"]');
     const editingId = submitButton.dataset.editingId;
@@ -216,7 +249,10 @@ if (productForm) {
       });
     }
 
-    await saveProducts(products);
+    // Sauvegarder uniquement dans localStorage
+    localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+    console.log('Produits sauvegardés dans localStorage');
+
     productForm.reset();
     handleImageSourceChange();
     await renderAdminProducts();
@@ -229,14 +265,34 @@ if (adminProducts) {
     const editButton = event.target.closest("[data-edit-product]");
 
     if (deleteButton) {
-      const products = (await getProducts()).filter((product) => product.id !== deleteButton.dataset.deleteProduct);
-      await saveProducts(products);
+      // Charger les produits depuis localStorage
+      const stored = localStorage.getItem(PRODUCT_KEY);
+      let products = [];
+      if (stored) {
+        try {
+          products = JSON.parse(stored);
+        } catch (e) {
+          console.error('Erreur lors de la lecture du localStorage:', e);
+        }
+      }
+      products = products.filter((product) => product.id !== deleteButton.dataset.deleteProduct);
+      localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+      console.log('Produit supprimé, sauvegardé dans localStorage');
       await renderAdminProducts();
     }
 
     if (editButton) {
       const productId = editButton.dataset.editProduct;
-      const products = await getProducts();
+      // Charger les produits depuis localStorage
+      const stored = localStorage.getItem(PRODUCT_KEY);
+      let products = [];
+      if (stored) {
+        try {
+          products = JSON.parse(stored);
+        } catch (e) {
+          console.error('Erreur lors de la lecture du localStorage:', e);
+        }
+      }
       const product = products.find((p) => p.id === productId);
       if (!product) return;
 
@@ -293,7 +349,16 @@ if (cancelEdit) {
 // Export JSON
 if (exportJSON) {
   exportJSON.addEventListener("click", async () => {
-    const products = await getProducts();
+    // Charger les produits depuis localStorage
+    const stored = localStorage.getItem(PRODUCT_KEY);
+    let products = [];
+    if (stored) {
+      try {
+        products = JSON.parse(stored);
+      } catch (e) {
+        console.error('Erreur lors de la lecture du localStorage:', e);
+      }
+    }
     const dataStr = JSON.stringify(products, null, 2);
     const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
@@ -320,7 +385,9 @@ if (importJSON && importFile) {
       const products = JSON.parse(text);
       if (!Array.isArray(products)) throw new Error("Format invalide");
 
-      await saveProducts(products);
+      // Sauvegarder uniquement dans localStorage
+      localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+      console.log('Produits importés, sauvegardés dans localStorage');
       await renderAdminProducts();
       alert("Produits importés avec succès !");
     } catch (error) {

@@ -34,34 +34,19 @@ async function loadProductsFromJSON() {
     }
   }
 
-  // Essayer de charger depuis le fichier products.json via PHP API
-  try {
-    const response = await fetch('../api/products.php');
-    if (response.ok) {
-      const products = await response.json();
-      if (Array.isArray(products) && products.length) {
-        localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-        console.log('Produits chargés depuis products.json via PHP API');
-        return products;
-      }
-    }
-  } catch (error) {
-    console.log('Impossible de charger depuis products.json via PHP API');
-  }
-
-  // Fallback: charger directement le fichier products.json
+  // Charger directement le fichier products.json
   try {
     const response = await fetch('../js/products.json');
     if (response.ok) {
       const products = await response.json();
       if (Array.isArray(products) && products.length) {
         localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-        console.log('Produits chargés depuis products.json directement');
+        console.log('Produits chargés depuis products.json');
         return products;
       }
     }
   } catch (error) {
-    console.log('Impossible de charger products.json directement');
+    console.log('Impossible de charger products.json');
   }
 
   // Fallback: utiliser le localStorage
@@ -111,23 +96,8 @@ async function saveProducts(products) {
     }
   }
 
-  // Sauvegarder dans le fichier products.json via PHP API
-  try {
-    const response = await fetch('../api/products.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(products),
-    });
-    if (response.ok) {
-      console.log('Produits sauvegardés dans products.json');
-    } else {
-      console.error('Erreur lors de la sauvegarde dans products.json');
-    }
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde via PHP API:', error);
-  }
+  // Note: Pour la persistance sur le serveur sans PHP, utilisez Exporter JSON
+  // et remplacez manuellement js/products.json sur le serveur
 }
 
 function getCart() {
@@ -146,18 +116,36 @@ function formatPrice(value) {
   return `${money.format(value)} FCFA`;
 }
 
-const productGrid = document.querySelector("#productGrid");
-const cartDrawer = document.querySelector(".cart-drawer");
-const cartItems = document.querySelector(".cart-items");
-const cartEmpty = document.querySelector(".cart-empty");
-const cartCount = document.querySelector(".cart-count");
-const cartTotal = document.querySelector(".cart-total strong");
-const checkoutLink = document.querySelector(".checkout-whatsapp");
-const googleMap = document.querySelector(".google-map");
-const mapChoices = document.querySelectorAll(".map-choice");
-const mapOpenLink = document.querySelector(".map-open-link");
-const mapPins = document.querySelectorAll("[data-map-pin]");
+let productGrid, cartDrawer, cartItems, cartEmpty, cartCount, cartTotal, checkoutLink, googleMap, mapChoices, mapOpenLink, mapPins;
 let activeFilter = "Tous";
+
+function initDOMElements() {
+  productGrid = document.querySelector("#productGrid");
+  cartDrawer = document.querySelector(".cart-drawer");
+  cartItems = document.querySelector(".cart-items");
+  cartEmpty = document.querySelector(".cart-empty");
+  cartCount = document.querySelector(".cart-count");
+  cartTotal = document.querySelector(".cart-total strong");
+  checkoutLink = document.querySelector(".checkout-whatsapp");
+  googleMap = document.querySelector(".google-map");
+  mapChoices = document.querySelectorAll(".map-choice");
+  mapOpenLink = document.querySelector(".map-open-link");
+  mapPins = document.querySelectorAll("[data-map-pin]");
+
+  // Initialize map choice event listeners
+  mapChoices.forEach((button) => {
+    button.addEventListener("click", () => setMapLocation(button.dataset.map));
+  });
+
+  // Initialize reveal observer
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.classList.add("is-visible");
+    });
+  }, { threshold: 0.14 });
+
+  document.querySelectorAll("[data-reveal]").forEach((element) => revealObserver.observe(element));
+}
 
 const MAPS = {
   fass: {
@@ -190,7 +178,7 @@ function setMapLocation(mapKey) {
 
 async function renderProducts() {
   if (!productGrid) {
-    console.log('productGrid non trouvé');
+    console.log('productGrid non trouvé - probablement sur la page admin');
     return;
   }
   const products = await getProducts();
@@ -320,22 +308,27 @@ document.addEventListener("click", async (event) => {
   if (mapChoice) setMapLocation(mapChoice.dataset.map);
 });
 
-mapChoices.forEach((button) => {
-  button.addEventListener("click", () => setMapLocation(button.dataset.map));
-});
-
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) entry.target.classList.add("is-visible");
+// Initialisation async - attendre que le DOM soit chargé
+if (document.readyState === 'loading') {
+  document.addEventListener("DOMContentLoaded", async () => {
+    initDOMElements();
+    // Ne rendre les produits que si on est sur la page publique (pas admin)
+    if (!document.body.classList.contains('admin-body')) {
+      console.log('Début du rendu des produits...');
+      await renderProducts();
+      console.log('Rendu des produits terminé');
+    }
+    await renderCart();
   });
-}, { threshold: 0.14 });
-
-document.querySelectorAll("[data-reveal]").forEach((element) => revealObserver.observe(element));
-
-// Initialisation async
-(async function init() {
-  console.log('Début du rendu des produits...');
-  await renderProducts();
-  console.log('Rendu des produits terminé');
-  await renderCart();
-})();
+} else {
+  (async function init() {
+    initDOMElements();
+    // Ne rendre les produits que si on est sur la page publique (pas admin)
+    if (!document.body.classList.contains('admin-body')) {
+      console.log('Début du rendu des produits...');
+      await renderProducts();
+      console.log('Rendu des produits terminé');
+    }
+    await renderCart();
+  })();
+}

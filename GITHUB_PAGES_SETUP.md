@@ -38,6 +38,13 @@ Le site Ihsane Fragrance fonctionne maintenant avec deux modes de synchronisatio
 - Vérifiez sur JSONBin.io que les données sont mises à jour
 - Tous les utilisateurs verront automatiquement les changements
 
+## Architecture Simplifiée
+- ✅ Pas de backend PHP requis
+- ✅ Chargement direct depuis `js/products.json`
+- ✅ Sauvegarde dans localStorage
+- ✅ Synchronisation optionnelle via JSONBin.io
+- ✅ Export/Import JSON pour sauvegarde manuelle
+
 ## Avantages
 - ✅ Fonctionne sur GitHub Pages
 - ✅ Synchronisation automatique avec JSONBin.io
