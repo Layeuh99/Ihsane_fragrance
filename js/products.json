@@ -5,7 +5,7 @@
     "category": "Parfums",
     "price": 18000,
     "badge": "Best seller",
-    "image": "../images/produits/Parfums/Al-saraha-blend.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Parfums/Al-saraha-blend.jpeg"
   },
   {
     "id": "parfum-al-saraha-candys",
@@ -13,7 +13,7 @@
     "category": "Parfums",
     "price": 18000,
     "badge": "",
-    "image": "../images/produits/Parfums/Al-saraha-candys.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Parfums/Al-saraha-candys.jpeg"
   },
   {
     "id": "parfum-al-saraha-pastiche",
@@ -21,7 +21,7 @@
     "category": "Parfums",
     "price": 18000,
     "badge": "",
-    "image": "../images/produits/Parfums/Al-saraha-pastiche.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Parfums/Al-saraha-pastiche.jpeg"
   },
   {
     "id": "huile-ambroise-kim-k",
@@ -29,7 +29,7 @@
     "category": "Huiles parfumées",
     "price": 7000,
     "badge": "",
-    "image": "../images/produits/Huiles parfumées/Ambroise Kim K.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Ambroise Kim K.jpeg"
   },
   {
     "id": "huile-bianco-latte",
@@ -37,7 +37,7 @@
     "category": "Huiles parfumées",
     "price": 7500,
     "badge": "Nouveau",
-    "image": "../images/produits/Huiles parfumées/Bianco latte Poussière d'or interdit Soft,Kayali 81 Hypnotic Candy love.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Bianco latte Poussière d'or interdit Soft,Kayali 81 Hypnotic Candy love.jpeg"
   },
   {
     "id": "huile-interdit-hypnotic",
@@ -45,7 +45,7 @@
     "category": "Huiles parfumées",
     "price": 7500,
     "badge": "",
-    "image": "../images/produits/Huiles parfumées/Interdit Hypnotic Poussiere d'or scandale.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Interdit Hypnotic Poussiere d'or scandale.jpeg"
   },
   {
     "id": "huile-kayali-28",
@@ -53,7 +53,7 @@
     "category": "Huiles parfumées",
     "price": 8000,
     "badge": "",
-    "image": "../images/produits/Huiles parfumées/Kayali 28 Bianco Latte Ambroisie Scandale.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Kayali 28 Bianco Latte Ambroisie Scandale.jpeg"
   },
   {
     "id": "huile-ambroise",
@@ -61,7 +61,7 @@
     "category": "Huiles parfumées",
     "price": 7000,
     "badge": "",
-    "image": "../images/produits/Huiles parfumées/ambroise-huile-parfumee.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/ambroise-huile-parfumee.jpeg"
   },
   {
     "id": "extrait-collection-kayali",
@@ -69,7 +69,7 @@
     "category": "Extraits",
     "price": 12000,
     "badge": "Premium",
-    "image": "../images/produits/Extraits/collection-kayali.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Extraits/collection-kayali.jpeg"
   },
   {
     "id": "extrait-femme-luxe",
@@ -77,7 +77,7 @@
     "category": "Extraits",
     "price": 12000,
     "badge": "",
-    "image": "../images/produits/Extraits/extraits-femme-luxe.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Extraits/extraits-femme-luxe.jpeg"
   },
   {
     "id": "extrait-kim-k-ambroise",
@@ -85,7 +85,7 @@
     "category": "Extraits",
     "price": 12000,
     "badge": "",
-    "image": "../images/produits/Extraits/kim-k-vs-ambroise.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Extraits/kim-k-vs-ambroise.jpeg"
   },
   {
     "id": "brume-parfumees-color",
@@ -93,7 +93,7 @@
     "category": "Brumes",
     "price": 8500,
     "badge": "",
-    "image": "../images/produits/Brumes/brumes-parfumees-color.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Brumes/brumes-parfumees-color.jpeg"
   },
   {
     "id": "musc-ambroisie",
@@ -101,7 +101,7 @@
     "category": "Musc",
     "price": 6500,
     "badge": "Doux",
-    "image": "../images/produits/Musc/musc-ambroisie.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Musc/musc-ambroisie.jpeg"
   },
   {
     "id": "musc-intime-premium",
@@ -109,6 +109,6 @@
     "category": "Musc",
     "price": 6500,
     "badge": "",
-    "image": "../images/produits/Musc/musc-intime-premium.jpeg"
+    "image": "/Ihsane_fragrance/images/produits/Musc/musc-intime-premium.jpeg"
   }
 ]
