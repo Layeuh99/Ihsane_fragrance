@@ -49,6 +49,26 @@
         <div class="admin-panel">
           <p class="eyebrow">Administration</p>
           <h1>Produits</h1>
+
+          <div class="storage-config">
+            <p class="eyebrow">Configuration Stockage Externe</p>
+            <details>
+              <summary>Configurer JSONBin.io (pour GitHub Pages)</summary>
+              <form class="product-form" id="storageConfigForm">
+                <label class="field">
+                  <span>URL JSONBin</span>
+                  <input name="storageUrl" type="url" placeholder="https://api.jsonbin.io/v3/b/...">
+                </label>
+                <label class="field">
+                  <span>Clé API (X-Master-Key)</span>
+                  <input name="storageKey" type="password" placeholder="Votre clé API JSONBin">
+                </label>
+                <button class="button primary" type="submit">Sauvegarder la configuration</button>
+                <button class="button ghost" type="button" id="clearStorageConfig">Effacer</button>
+              </form>
+            </details>
+          </div>
+
           <form class="product-form" id="productForm">
             <label class="field">
               <span>Nom du produit</span>
@@ -91,6 +111,9 @@
             <button class="button primary" type="submit">Ajouter le produit</button>
             <button class="button ghost" type="button" id="cancelEdit" hidden>Annuler</button>
             <button class="button ghost" type="button" id="resetProducts">Réinitialiser</button>
+            <button class="button ghost" type="button" id="exportJSON">Exporter JSON</button>
+            <button class="button ghost" type="button" id="importJSON">Importer JSON</button>
+            <input type="file" id="importFile" accept=".json" hidden>
           </form>
         </div>
 

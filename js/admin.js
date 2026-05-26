@@ -2,6 +2,11 @@ const adminProducts = document.querySelector("#adminProducts");
 const productForm = document.querySelector("#productForm");
 const resetProducts = document.querySelector("#resetProducts");
 const cancelEdit = document.querySelector("#cancelEdit");
+const exportJSON = document.querySelector("#exportJSON");
+const importJSON = document.querySelector("#importJSON");
+const importFile = document.querySelector("#importFile");
+const storageConfigForm = document.querySelector("#storageConfigForm");
+const clearStorageConfig = document.querySelector("#clearStorageConfig");
 const adminLogin = document.querySelector("#adminLogin");
 const adminPrivate = document.querySelector("#adminPrivate");
 const loginForm = document.querySelector("#loginForm");
@@ -106,8 +111,25 @@ function slugify(value) {
     .replace(/(^-|-$)/g, "");
 }
 
-function renderAdminProducts() {
-  const products = getProducts();
+async function saveProductsToServer(products) {
+  try {
+    const response = await fetch('../api/products.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(products),
+    });
+    const result = await response.json();
+    return result.success;
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde sur le serveur:', error);
+    return false;
+  }
+}
+
+async function renderAdminProducts() {
+  const products = await getProducts();
   adminProducts.innerHTML = products.map((product) => `
     <article class="admin-product" data-product-id="${product.id}">
       <img src="${product.image}" alt="${product.name}">
@@ -152,7 +174,7 @@ if (productForm) {
     event.preventDefault();
     const data = new FormData(productForm);
     const name = data.get("name").trim();
-    const products = getProducts();
+    const products = await getProducts();
 
     const submitButton = productForm.querySelector('button[type="submit"]');
     const editingId = submitButton.dataset.editingId;
@@ -212,27 +234,27 @@ if (productForm) {
       });
     }
 
-    saveProducts(products);
+    await saveProducts(products);
     productForm.reset();
     handleImageSourceChange();
-    renderAdminProducts();
+    await renderAdminProducts();
   });
 }
 
 if (adminProducts) {
-  adminProducts.addEventListener("click", (event) => {
+  adminProducts.addEventListener("click", async (event) => {
     const deleteButton = event.target.closest("[data-delete-product]");
     const editButton = event.target.closest("[data-edit-product]");
 
     if (deleteButton) {
-      const products = getProducts().filter((product) => product.id !== deleteButton.dataset.deleteProduct);
-      saveProducts(products);
-      renderAdminProducts();
+      const products = (await getProducts()).filter((product) => product.id !== deleteButton.dataset.deleteProduct);
+      await saveProducts(products);
+      await renderAdminProducts();
     }
 
     if (editButton) {
       const productId = editButton.dataset.editProduct;
-      const products = getProducts();
+      const products = await getProducts();
       const product = products.find((p) => p.id === productId);
       if (!product) return;
 
@@ -275,10 +297,10 @@ if (adminProducts) {
 }
 
 if (resetProducts) {
-  resetProducts.addEventListener("click", () => {
-    saveProducts(DEFAULT_PRODUCTS);
+  resetProducts.addEventListener("click", async () => {
+    await saveProducts(DEFAULT_PRODUCTS);
     localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
-    renderAdminProducts();
+    await renderAdminProducts();
     alert("Produits réinitialisés avec les nouvelles images.");
   });
 }
@@ -291,6 +313,81 @@ if (cancelEdit) {
     submitButton.textContent = "Ajouter le produit";
     delete submitButton.dataset.editingId;
     cancelEdit.hidden = true;
+  });
+}
+
+// Export JSON
+if (exportJSON) {
+  exportJSON.addEventListener("click", async () => {
+    const products = await getProducts();
+    const dataStr = JSON.stringify(products, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "products.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+// Import JSON
+if (importJSON && importFile) {
+  importJSON.addEventListener("click", () => {
+    importFile.click();
+  });
+
+  importFile.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const products = JSON.parse(text);
+      if (!Array.isArray(products)) throw new Error("Format invalide");
+
+      await saveProducts(products);
+      localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+      await renderAdminProducts();
+      alert("Produits importés avec succès !");
+    } catch (error) {
+      alert("Erreur lors de l'import : " + error.message);
+    }
+
+    importFile.value = "";
+  });
+}
+
+// Configuration du stockage externe
+if (storageConfigForm) {
+  // Charger la configuration existante
+  const existingUrl = localStorage.getItem('ihsane_storage_url');
+  const existingKey = localStorage.getItem('ihsane_storage_key');
+  if (existingUrl) storageConfigForm.querySelector('[name="storageUrl"]').value = existingUrl;
+  if (existingKey) storageConfigForm.querySelector('[name="storageKey"]').value = existingKey;
+
+  storageConfigForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(storageConfigForm);
+    const url = data.get("storageUrl").trim();
+    const key = data.get("storageKey").trim();
+
+    localStorage.setItem('ihsane_storage_url', url);
+    localStorage.setItem('ihsane_storage_key', key);
+
+    alert("Configuration sauvegardée ! Rechargez la page pour appliquer les changements.");
+  });
+}
+
+if (clearStorageConfig) {
+  clearStorageConfig.addEventListener("click", () => {
+    localStorage.removeItem('ihsane_storage_url');
+    localStorage.removeItem('ihsane_storage_key');
+    if (storageConfigForm) {
+      storageConfigForm.querySelector('[name="storageUrl"]').value = '';
+      storageConfigForm.querySelector('[name="storageKey"]').value = '';
+    }
+    alert("Configuration effacée ! Rechargez la page pour appliquer les changements.");
   });
 }
 

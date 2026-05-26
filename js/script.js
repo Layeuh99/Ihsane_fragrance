@@ -122,7 +122,54 @@ const money = new Intl.NumberFormat("fr-FR", {
   maximumFractionDigits: 0,
 });
 
-function getProducts() {
+// Configuration pour le stockage externe (JSONBin.io ou autre)
+const EXTERNAL_STORAGE_URL = localStorage.getItem('ihsane_storage_url') || '';
+const EXTERNAL_STORAGE_KEY = localStorage.getItem('ihsane_storage_key') || '';
+
+async function loadProductsFromJSON() {
+  // Essayer d'abord le stockage externe si configuré
+  if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
+    try {
+      const response = await fetch(EXTERNAL_STORAGE_URL, {
+        headers: {
+          'X-Master-Key': EXTERNAL_STORAGE_KEY,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const products = data.record || data;
+        if (Array.isArray(products) && products.length) {
+          localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+          localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+          return products;
+        }
+      }
+    } catch (error) {
+      console.log('Impossible de charger depuis le stockage externe');
+    }
+  }
+
+  // Essayer l'API PHP locale
+  try {
+    const response = await fetch('../api/products.php');
+    if (!response.ok) throw new Error('Failed to load products from API');
+    const products = await response.json();
+    if (Array.isArray(products) && products.length) {
+      localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+      localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+      return products;
+    }
+  } catch (error) {
+    console.log('Impossible de charger les produits depuis l\'API, utilisation du localStorage');
+  }
+  return null;
+}
+
+async function getProducts() {
+  // Essayer de charger depuis le fichier JSON d'abord
+  const jsonProducts = await loadProductsFromJSON();
+  if (jsonProducts) return jsonProducts;
+
   const stored = localStorage.getItem(PRODUCT_KEY);
   const version = localStorage.getItem(PRODUCT_KEY + "_version");
 
@@ -143,8 +190,44 @@ function getProducts() {
   }
 }
 
-function saveProducts(products) {
+async function saveProducts(products) {
   localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+
+  // Sauvegarder sur le stockage externe si configuré
+  if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
+    try {
+      const response = await fetch(EXTERNAL_STORAGE_URL, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': EXTERNAL_STORAGE_KEY,
+        },
+        body: JSON.stringify(products),
+      });
+      if (response.ok) {
+        console.log('Produits sauvegardés sur le stockage externe');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde sur le stockage externe:', error);
+    }
+  }
+
+  // Sauvegarder aussi sur le serveur local (API PHP)
+  try {
+    const response = await fetch('../api/products.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(products),
+    });
+    const result = await response.json();
+    if (result.success) {
+      console.log('Produits sauvegardés sur le serveur local');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde sur le serveur local:', error);
+  }
 }
 
 function getCart() {
@@ -205,9 +288,9 @@ function setMapLocation(mapKey) {
   });
 }
 
-function renderProducts() {
+async function renderProducts() {
   if (!productGrid) return;
-  const products = getProducts();
+  const products = await getProducts();
   const visibleProducts = activeFilter === "Tous"
     ? products
     : products.filter((product) => product.category === activeFilter);
@@ -228,10 +311,10 @@ function renderProducts() {
   `).join("");
 }
 
-function renderCart() {
+async function renderCart() {
   if (!cartItems) return;
   const cart = getCart();
-  const products = getProducts();
+  const products = await getProducts();
   const detailedCart = cart
     .map((item) => ({ ...products.find((product) => product.id === item.id), qty: item.qty }))
     .filter((item) => item.id);
@@ -265,17 +348,17 @@ function renderCart() {
   checkoutLink.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
 }
 
-function addToCart(id) {
+async function addToCart(id) {
   const cart = getCart();
   const existing = cart.find((item) => item.id === id);
   if (existing) existing.qty += 1;
   else cart.push({ id, qty: 1 });
   saveCart(cart);
-  renderCart();
+  await renderCart();
   openCart();
 }
 
-function updateCart(id, direction) {
+async function updateCart(id, direction) {
   const cart = getCart();
   const item = cart.find((cartItem) => cartItem.id === id);
   if (!item) return;
@@ -283,7 +366,7 @@ function updateCart(id, direction) {
   item.qty += direction;
   const nextCart = cart.filter((cartItem) => cartItem.qty > 0);
   saveCart(nextCart);
-  renderCart();
+  await renderCart();
 }
 
 function openCart() {
@@ -296,9 +379,9 @@ function closeCart() {
   cartDrawer?.setAttribute("aria-hidden", "true");
 }
 
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   const addButton = event.target.closest(".add-to-cart");
-  if (addButton) addToCart(addButton.dataset.id);
+  if (addButton) await addToCart(addButton.dataset.id);
 
   const filter = event.target.closest("[data-filter]");
   if (filter && (filter.classList.contains("filter") || filter.classList.contains("category-card"))) {
@@ -306,11 +389,11 @@ document.addEventListener("click", (event) => {
     document.querySelectorAll(".filter").forEach((button) => {
       button.classList.toggle("active", button.dataset.filter === activeFilter);
     });
-    renderProducts();
+    await renderProducts();
   }
 
   const cartAction = event.target.closest("[data-cart-action]");
-  if (cartAction) updateCart(cartAction.dataset.id, cartAction.dataset.cartAction === "increase" ? 1 : -1);
+  if (cartAction) await updateCart(cartAction.dataset.id, cartAction.dataset.cartAction === "increase" ? 1 : -1);
 
   if (event.target.closest(".cart-button")) openCart();
   if (event.target.closest(".close-cart") || event.target.classList.contains("cart-backdrop")) closeCart();
@@ -343,9 +426,8 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 document.querySelectorAll("[data-reveal]").forEach((element) => revealObserver.observe(element));
 
-// Forcer le rechargement des produits avec les nouvelles images
-localStorage.removeItem(PRODUCT_KEY);
-localStorage.removeItem(PRODUCT_KEY + "_version");
-
-renderProducts();
-renderCart();
+// Initialisation async
+(async function init() {
+  await renderProducts();
+  await renderCart();
+})();
