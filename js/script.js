@@ -186,6 +186,8 @@ async function getProducts() {
 
 async function saveProducts(products) {
   localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+  localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+  console.log('Produits sauvegardés dans le localStorage');
 
   // Sauvegarder sur le stockage externe si configuré
   if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
