@@ -12,7 +12,21 @@ const EXTERNAL_STORAGE_URL = localStorage.getItem('ihsane_storage_url') || '';
 const EXTERNAL_STORAGE_KEY = localStorage.getItem('ihsane_storage_key') || '';
 
 async function loadProductsFromJSON() {
-  // Essayer d'abord le stockage externe si configuré (JSONBin.io)
+  // Priorité 1: localStorage (où l'admin sauvegarde)
+  const stored = localStorage.getItem(PRODUCT_KEY);
+  if (stored) {
+    try {
+      const products = JSON.parse(stored);
+      if (Array.isArray(products) && products.length) {
+        console.log('Produits chargés depuis localStorage');
+        return products;
+      }
+    } catch (e) {
+      console.error('Erreur lors de la lecture du localStorage:', e);
+    }
+  }
+
+  // Priorité 2: Stockage externe si configuré (JSONBin.io)
   if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
     try {
       const response = await fetch(EXTERNAL_STORAGE_URL, {
@@ -34,7 +48,7 @@ async function loadProductsFromJSON() {
     }
   }
 
-  // Charger directement le fichier products.json
+  // Priorité 3: Charger directement le fichier products.json
   try {
     const response = await fetch('../js/products.json');
     if (response.ok) {
@@ -47,20 +61,6 @@ async function loadProductsFromJSON() {
     }
   } catch (error) {
     console.log('Impossible de charger products.json');
-  }
-
-  // Fallback: utiliser le localStorage
-  const stored = localStorage.getItem(PRODUCT_KEY);
-  if (stored) {
-    try {
-      const products = JSON.parse(stored);
-      if (Array.isArray(products) && products.length) {
-        console.log('Utilisation des produits du localStorage');
-        return products;
-      }
-    } catch (e) {
-      console.error('Erreur lors de la lecture du localStorage:', e);
-    }
   }
 
   // Si aucune source n'a de données, retourner un tableau vide
