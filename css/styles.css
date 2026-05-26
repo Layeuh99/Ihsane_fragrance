@@ -273,6 +273,11 @@ h1 {
   margin-bottom: 1.3rem;
   font-size: clamp(3.5rem, 8vw, 7.6rem);
 }
+
+.admin-login h1 {
+  max-width: 100%;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
 h2 {
   margin-bottom: 1rem;
   font-size: clamp(2.1rem, 4vw, 4.35rem);

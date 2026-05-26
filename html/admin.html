@@ -26,7 +26,7 @@
 
       <section class="admin-login admin-panel" id="adminLogin">
         <p class="eyebrow">Accès privé</p>
-        <h1>Connexion admin</h1>
+        <h1 id="loginTitle">Connexion admin</h1>
         <form class="product-form" id="loginForm">
           <label class="field">
             <span>Email</span>
@@ -36,8 +36,12 @@
             <span>Mot de passe</span>
             <input name="password" type="password" required placeholder="Votre mot de passe" autocomplete="current-password">
           </label>
+          <label class="field" id="confirmPasswordField" hidden>
+            <span>Confirmer le mot de passe</span>
+            <input name="confirmPassword" type="password" placeholder="Confirmer votre mot de passe">
+          </label>
           <p class="login-error" id="loginError" role="alert"></p>
-          <button class="button primary" type="submit">Se connecter</button>
+          <button class="button primary" type="submit" id="loginSubmit">Se connecter</button>
         </form>
       </section>
 
@@ -69,9 +73,21 @@
               <input name="badge" placeholder="Promo, Nouveau, Best seller">
             </label>
             <label class="field">
-              <span>Image URL</span>
-              <input name="image" required placeholder="https://...">
+              <span>Source de l'image</span>
+              <select name="imageSource" id="imageSource" required>
+                <option value="url">URL</option>
+                <option value="upload">Upload local</option>
+              </select>
             </label>
+            <label class="field" id="urlField">
+              <span>Image URL</span>
+              <input name="imageUrl" id="imageUrl" placeholder="https://...">
+            </label>
+            <label class="field" id="uploadField" hidden>
+              <span>Image locale</span>
+              <input name="imageFile" id="imageFile" type="file" accept="image/*">
+            </label>
+            <input type="hidden" name="image" id="imageHidden">
             <button class="button primary" type="submit">Ajouter le produit</button>
             <button class="button ghost" type="button" id="resetProducts">Réinitialiser</button>
           </form>
