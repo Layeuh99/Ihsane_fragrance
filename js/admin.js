@@ -1,6 +1,5 @@
 const adminProducts = document.querySelector("#adminProducts");
 const productForm = document.querySelector("#productForm");
-const resetProducts = document.querySelector("#resetProducts");
 const cancelEdit = document.querySelector("#cancelEdit");
 const exportJSON = document.querySelector("#exportJSON");
 const importJSON = document.querySelector("#importJSON");
@@ -109,23 +108,6 @@ function slugify(value) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-}
-
-async function saveProductsToServer(products) {
-  try {
-    const response = await fetch('../api/products.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(products),
-    });
-    const result = await response.json();
-    return result.success;
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde sur le serveur:', error);
-    return false;
-  }
 }
 
 async function renderAdminProducts() {
@@ -296,14 +278,6 @@ if (adminProducts) {
   });
 }
 
-if (resetProducts) {
-  resetProducts.addEventListener("click", async () => {
-    await saveProducts(DEFAULT_PRODUCTS);
-    localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
-    await renderAdminProducts();
-    alert("Produits réinitialisés avec les nouvelles images.");
-  });
-}
 
 if (cancelEdit) {
   cancelEdit.addEventListener("click", () => {
@@ -347,7 +321,6 @@ if (importJSON && importFile) {
       if (!Array.isArray(products)) throw new Error("Format invalide");
 
       await saveProducts(products);
-      localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
       await renderAdminProducts();
       alert("Produits importés avec succès !");
     } catch (error) {

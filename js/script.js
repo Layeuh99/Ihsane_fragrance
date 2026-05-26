@@ -1,122 +1,7 @@
-const DEFAULT_PRODUCTS = [
-  {
-    id: "parfum-al-saraha-blend",
-    name: "Al Saraha Blend",
-    category: "Parfums",
-    price: 18000,
-    badge: "Best seller",
-    image: "/Ihsane_fragrance/images/produits/Parfums/Al-saraha-blend.jpeg",
-  },
-  {
-    id: "parfum-al-saraha-candys",
-    name: "Al Saraha Candys",
-    category: "Parfums",
-    price: 18000,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Parfums/Al-saraha-candys.jpeg",
-  },
-  {
-    id: "parfum-al-saraha-pastiche",
-    name: "Al Saraha Pastiche",
-    category: "Parfums",
-    price: 18000,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Parfums/Al-saraha-pastiche.jpeg",
-  },
-  {
-    id: "huile-ambroise-kim-k",
-    name: "Ambroise Kim K",
-    category: "Huiles parfumées",
-    price: 7000,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Huiles parfumées/Ambroise Kim K.jpeg",
-  },
-  {
-    id: "huile-bianco-latte",
-    name: "Bianco Latte Poussière d'Or Interdit Soft",
-    category: "Huiles parfumées",
-    price: 7500,
-    badge: "Nouveau",
-    image: "/Ihsane_fragrance/images/produits/Huiles parfumées/Bianco latte Poussière d'or interdit Soft,Kayali 81 Hypnotic Candy love.jpeg",
-  },
-  {
-    id: "huile-interdit-hypnotic",
-    name: "Interdit Hypnotic Poussière d'Or Scandale",
-    category: "Huiles parfumées",
-    price: 7500,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Huiles parfumées/Interdit Hypnotic Poussiere d'or scandale.jpeg",
-  },
-  {
-    id: "huile-kayali-28",
-    name: "Kayali 28 Bianco Latte Ambroisie Scandale",
-    category: "Huiles parfumées",
-    price: 8000,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Huiles parfumées/Kayali 28 Bianco Latte Ambroisie Scandale.jpeg",
-  },
-  {
-    id: "huile-ambroise",
-    name: "Ambroise Huile Parfumée",
-    category: "Huiles parfumées",
-    price: 7000,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Huiles parfumées/ambroise-huile-parfumee.jpeg",
-  },
-  {
-    id: "extrait-collection-kayali",
-    name: "Collection Kayali",
-    category: "Extraits",
-    price: 12000,
-    badge: "Premium",
-    image: "/Ihsane_fragrance/images/produits/Extraits/collection-kayali.jpeg",
-  },
-  {
-    id: "extrait-femme-luxe",
-    name: "Extraits Femme Luxe",
-    category: "Extraits",
-    price: 12000,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Extraits/extraits-femme-luxe.jpeg",
-  },
-  {
-    id: "extrait-kim-k-ambroise",
-    name: "Kim K vs Ambroise",
-    category: "Extraits",
-    price: 12000,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Extraits/kim-k-vs-ambroise.jpeg",
-  },
-  {
-    id: "brume-parfumees-color",
-    name: "Brumes Parfumées Color",
-    category: "Brumes",
-    price: 8500,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Brumes/brumes-parfumees-color.jpeg",
-  },
-  {
-    id: "musc-ambroisie",
-    name: "Musc Ambroisie",
-    category: "Musc",
-    price: 6500,
-    badge: "Doux",
-    image: "/Ihsane_fragrance/images/produits/Musc/musc-ambroisie.jpeg",
-  },
-  {
-    id: "musc-intime-premium",
-    name: "Musc Intime Premium",
-    category: "Musc",
-    price: 6500,
-    badge: "",
-    image: "/Ihsane_fragrance/images/produits/Musc/musc-intime-premium.jpeg",
-  },
-];
 
 const PRODUCT_KEY = "ihsane_fragrance_products";
 const CART_KEY = "ihsane_fragrance_cart";
 const WHATSAPP_NUMBER = "221775714346";
-const PRODUCTS_VERSION = "v5_force_reload";
 
 const money = new Intl.NumberFormat("fr-FR", {
   maximumFractionDigits: 0,
@@ -127,7 +12,7 @@ const EXTERNAL_STORAGE_URL = localStorage.getItem('ihsane_storage_url') || '';
 const EXTERNAL_STORAGE_KEY = localStorage.getItem('ihsane_storage_key') || '';
 
 async function loadProductsFromJSON() {
-  // Essayer d'abord le stockage externe si configuré
+  // Essayer d'abord le stockage externe si configuré (JSONBin.io)
   if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
     try {
       const response = await fetch(EXTERNAL_STORAGE_URL, {
@@ -140,7 +25,6 @@ async function loadProductsFromJSON() {
         const products = data.record || data;
         if (Array.isArray(products) && products.length) {
           localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-          localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
           console.log('Produits chargés depuis le stockage externe');
           return products;
         }
@@ -150,34 +34,53 @@ async function loadProductsFromJSON() {
     }
   }
 
-  // Vérifier la version dans le localStorage
-  const stored = localStorage.getItem(PRODUCT_KEY);
-  const version = localStorage.getItem(PRODUCT_KEY + "_version");
-
-  // Si la version ne correspond pas, utiliser DEFAULT_PRODUCTS
-  if (!stored || version !== PRODUCTS_VERSION) {
-    console.log('Version changée ou localStorage vide, utilisation de DEFAULT_PRODUCTS');
-    localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
-    localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
-    return DEFAULT_PRODUCTS;
-  }
-
-  // Sinon utiliser le localStorage
+  // Essayer de charger depuis le fichier products.json via PHP API
   try {
-    const products = JSON.parse(stored);
-    if (Array.isArray(products) && products.length) {
-      console.log('Utilisation des produits du localStorage');
-      return products;
+    const response = await fetch('../api/products.php');
+    if (response.ok) {
+      const products = await response.json();
+      if (Array.isArray(products) && products.length) {
+        localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+        console.log('Produits chargés depuis products.json via PHP API');
+        return products;
+      }
     }
-  } catch (e) {
-    // Si erreur, utiliser DEFAULT_PRODUCTS
+  } catch (error) {
+    console.log('Impossible de charger depuis products.json via PHP API');
   }
 
-  // Utiliser DEFAULT_PRODUCTS en dernier recours
-  console.log('Utilisation des produits par défaut avec vraies images');
-  localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
-  localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
-  return DEFAULT_PRODUCTS;
+  // Fallback: charger directement le fichier products.json
+  try {
+    const response = await fetch('../js/products.json');
+    if (response.ok) {
+      const products = await response.json();
+      if (Array.isArray(products) && products.length) {
+        localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+        console.log('Produits chargés depuis products.json directement');
+        return products;
+      }
+    }
+  } catch (error) {
+    console.log('Impossible de charger products.json directement');
+  }
+
+  // Fallback: utiliser le localStorage
+  const stored = localStorage.getItem(PRODUCT_KEY);
+  if (stored) {
+    try {
+      const products = JSON.parse(stored);
+      if (Array.isArray(products) && products.length) {
+        console.log('Utilisation des produits du localStorage');
+        return products;
+      }
+    } catch (e) {
+      console.error('Erreur lors de la lecture du localStorage:', e);
+    }
+  }
+
+  // Si aucune source n'a de données, retourner un tableau vide
+  console.log('Aucun produit trouvé, retour d\'un tableau vide');
+  return [];
 }
 
 async function getProducts() {
@@ -185,11 +88,11 @@ async function getProducts() {
 }
 
 async function saveProducts(products) {
+  // Sauvegarder dans le localStorage
   localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-  localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
   console.log('Produits sauvegardés dans le localStorage');
 
-  // Sauvegarder sur le stockage externe si configuré
+  // Sauvegarder sur le stockage externe si configuré (JSONBin.io)
   if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
     try {
       const response = await fetch(EXTERNAL_STORAGE_URL, {
@@ -208,8 +111,23 @@ async function saveProducts(products) {
     }
   }
 
-  // Note: Pour le mode local sans stockage externe, utilisez Exporter JSON
-  // et remplacez manuellement js/products.json sur le serveur
+  // Sauvegarder dans le fichier products.json via PHP API
+  try {
+    const response = await fetch('../api/products.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(products),
+    });
+    if (response.ok) {
+      console.log('Produits sauvegardés dans products.json');
+    } else {
+      console.error('Erreur lors de la sauvegarde dans products.json');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde via PHP API:', error);
+  }
 }
 
 function getCart() {
