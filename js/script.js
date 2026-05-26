@@ -150,7 +150,21 @@ async function loadProductsFromJSON() {
     }
   }
 
-  // Utiliser DEFAULT_PRODUCTS directement (contient les vraies images)
+  // Ne pas écraser le localStorage - utiliser ce qui existe ou DEFAULT_PRODUCTS
+  const stored = localStorage.getItem(PRODUCT_KEY);
+  if (stored) {
+    try {
+      const products = JSON.parse(stored);
+      if (Array.isArray(products) && products.length) {
+        console.log('Utilisation des produits du localStorage');
+        return products;
+      }
+    } catch (e) {
+      // Si erreur, utiliser DEFAULT_PRODUCTS
+    }
+  }
+
+  // Utiliser DEFAULT_PRODUCTS seulement si localStorage est vide
   console.log('Utilisation des produits par défaut avec vraies images');
   localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
   localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
@@ -158,28 +172,7 @@ async function loadProductsFromJSON() {
 }
 
 async function getProducts() {
-  // Essayer de charger depuis le fichier JSON d'abord
-  const jsonProducts = await loadProductsFromJSON();
-  if (jsonProducts) return jsonProducts;
-
-  const stored = localStorage.getItem(PRODUCT_KEY);
-  const version = localStorage.getItem(PRODUCT_KEY + "_version");
-
-  // Forcer la réinitialisation si la version ne correspond pas
-  if (!stored || version !== PRODUCTS_VERSION) {
-    localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
-    localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
-    return DEFAULT_PRODUCTS;
-  }
-
-  try {
-    const products = JSON.parse(stored);
-    return Array.isArray(products) && products.length ? products : DEFAULT_PRODUCTS;
-  } catch {
-    localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
-    localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
-    return DEFAULT_PRODUCTS;
-  }
+  return await loadProductsFromJSON();
 }
 
 async function saveProducts(products) {
@@ -267,12 +260,17 @@ function setMapLocation(mapKey) {
 }
 
 async function renderProducts() {
-  if (!productGrid) return;
+  if (!productGrid) {
+    console.log('productGrid non trouvé');
+    return;
+  }
   const products = await getProducts();
+  console.log('Produits chargés:', products.length);
   const visibleProducts = activeFilter === "Tous"
     ? products
     : products.filter((product) => product.category === activeFilter);
 
+  console.log('Produits visibles:', visibleProducts.length);
   productGrid.innerHTML = visibleProducts.map((product) => `
     <article class="product-card">
       ${product.badge ? `<span class="badge">${product.badge}</span>` : ""}
@@ -287,6 +285,7 @@ async function renderProducts() {
       </div>
     </article>
   `).join("");
+  console.log('HTML généré, longueur:', productGrid.innerHTML.length);
 }
 
 async function renderCart() {
@@ -406,10 +405,8 @@ document.querySelectorAll("[data-reveal]").forEach((element) => revealObserver.o
 
 // Initialisation async
 (async function init() {
-  // Forcer le rechargement avec les nouveaux produits
-  localStorage.removeItem(PRODUCT_KEY);
-  localStorage.removeItem(PRODUCT_KEY + "_version");
-
+  console.log('Début du rendu des produits...');
   await renderProducts();
+  console.log('Rendu des produits terminé');
   await renderCart();
 })();
