@@ -2,10 +2,11 @@
 
 Le site Ihsane Fragrance fonctionne maintenant avec deux modes de synchronisation :
 
-## Mode Local (XAMPP/Tomcat)
-- Utilise l'API PHP (`api/products.php`)
-- Sauvegarde automatique dans `js/products.json`
-- Fonctionne sur votre serveur local
+## Mode Local (Tomcat/XAMPP)
+- Charge les produits depuis `js/products.json`
+- Sauvegarde dans le localStorage
+- Pour synchroniser : Exporter JSON → Remplacer `js/products.json` manuellement
+- Fonctionne sur votre serveur local Tomcat
 
 ## Mode GitHub Pages
 - Utilise un stockage externe (JSONBin.io)
@@ -39,10 +40,10 @@ Le site Ihsane Fragrance fonctionne maintenant avec deux modes de synchronisatio
 
 ## Avantages
 - ✅ Fonctionne sur GitHub Pages
-- ✅ Synchronisation automatique
+- ✅ Synchronisation automatique avec JSONBin.io
 - ✅ Pas besoin de backend PHP
+- ✅ Compatible Tomcat (mode local avec export/import manuel)
 - ✅ Gratuit avec JSONBin.io (limites généreuses)
-- ✅ Compatible avec les deux modes
 
 ## Alternative
 Vous pouvez aussi utiliser d'autres services compatibles :

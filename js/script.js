@@ -141,6 +141,7 @@ async function loadProductsFromJSON() {
         if (Array.isArray(products) && products.length) {
           localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
           localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+          console.log('Produits chargés depuis le stockage externe');
           return products;
         }
       }
@@ -149,20 +150,11 @@ async function loadProductsFromJSON() {
     }
   }
 
-  // Essayer l'API PHP locale
-  try {
-    const response = await fetch('../api/products.php');
-    if (!response.ok) throw new Error('Failed to load products from API');
-    const products = await response.json();
-    if (Array.isArray(products) && products.length) {
-      localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-      localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
-      return products;
-    }
-  } catch (error) {
-    console.log('Impossible de charger les produits depuis l\'API, utilisation du localStorage');
-  }
-  return null;
+  // Utiliser DEFAULT_PRODUCTS directement (contient les vraies images)
+  console.log('Utilisation des produits par défaut avec vraies images');
+  localStorage.setItem(PRODUCT_KEY, JSON.stringify(DEFAULT_PRODUCTS));
+  localStorage.setItem(PRODUCT_KEY + "_version", PRODUCTS_VERSION);
+  return DEFAULT_PRODUCTS;
 }
 
 async function getProducts() {
@@ -212,22 +204,8 @@ async function saveProducts(products) {
     }
   }
 
-  // Sauvegarder aussi sur le serveur local (API PHP)
-  try {
-    const response = await fetch('../api/products.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(products),
-    });
-    const result = await response.json();
-    if (result.success) {
-      console.log('Produits sauvegardés sur le serveur local');
-    }
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde sur le serveur local:', error);
-  }
+  // Note: Pour le mode local sans stockage externe, utilisez Exporter JSON
+  // et remplacez manuellement js/products.json sur le serveur
 }
 
 function getCart() {
@@ -428,6 +406,10 @@ document.querySelectorAll("[data-reveal]").forEach((element) => revealObserver.o
 
 // Initialisation async
 (async function init() {
+  // Forcer le rechargement avec les nouveaux produits
+  localStorage.removeItem(PRODUCT_KEY);
+  localStorage.removeItem(PRODUCT_KEY + "_version");
+
   await renderProducts();
   await renderCart();
 })();
