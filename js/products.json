@@ -27,64 +27,64 @@
     "id": "huile-ambroise-kim-k",
     "name": "Ambroise Kim K",
     "category": "Huiles parfumées",
-    "price": 7000,
-    "badge": "",
+    "price": 5500,
+    "badge": "Pack",
     "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Ambroise Kim K.jpeg"
   },
   {
     "id": "huile-bianco-latte",
     "name": "Bianco Latte Poussière d'Or Interdit Soft",
     "category": "Huiles parfumées",
-    "price": 7500,
-    "badge": "Nouveau",
+    "price": 2500,
+    "badge": "L'unité",
     "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Bianco latte Poussière d'or interdit Soft,Kayali 81 Hypnotic Candy love.jpeg"
   },
   {
     "id": "huile-interdit-hypnotic",
     "name": "Interdit Hypnotic Poussière d'Or Scandale",
     "category": "Huiles parfumées",
-    "price": 7500,
-    "badge": "",
+    "price": 2500,
+    "badge": "L'unité",
     "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Interdit Hypnotic Poussiere d'or scandale.jpeg"
   },
   {
     "id": "huile-kayali-28",
     "name": "Kayali 28 Bianco Latte Ambroisie Scandale",
-    "category": "Huiles parfumées",
-    "price": 8000,
-    "badge": "",
+    "category": "Extraits",
+    "price": 3000,
+    "badge": "L'unité",
     "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/Kayali 28 Bianco Latte Ambroisie Scandale.jpeg"
   },
   {
     "id": "huile-ambroise",
-    "name": "Ambroise Huile Parfumée",
-    "category": "Huiles parfumées",
-    "price": 7000,
-    "badge": "",
+    "name": "Ambroise Déodorant a base de Musc",
+    "category": "Musc",
+    "price": 3500,
+    "badge": "Déodorant",
     "image": "/Ihsane_fragrance/images/produits/Huiles parfumées/ambroise-huile-parfumee.jpeg"
   },
   {
     "id": "extrait-collection-kayali",
     "name": "Collection Kayali",
     "category": "Extraits",
-    "price": 12000,
-    "badge": "Premium",
+    "price": 3000,
+    "badge": "L'unité",
     "image": "/Ihsane_fragrance/images/produits/Extraits/collection-kayali.jpeg"
   },
   {
     "id": "extrait-femme-luxe",
     "name": "Extraits Femme Luxe",
     "category": "Extraits",
-    "price": 12000,
-    "badge": "",
+    "price": 3000,
+    "badge": "L'unité",
     "image": "/Ihsane_fragrance/images/produits/Extraits/extraits-femme-luxe.jpeg"
   },
   {
     "id": "extrait-kim-k-ambroise",
     "name": "Kim K vs Ambroise",
     "category": "Extraits",
-    "price": 12000,
-    "badge": "",
+    "price": 5500,
+    "badge": "Pack",
     "image": "/Ihsane_fragrance/images/produits/Extraits/kim-k-vs-ambroise.jpeg"
   },
   {
@@ -99,16 +99,16 @@
     "id": "musc-ambroisie",
     "name": "Musc Ambroisie",
     "category": "Musc",
-    "price": 6500,
-    "badge": "Doux",
+    "price": 3500,
+    "badge": "Déodorant",
     "image": "/Ihsane_fragrance/images/produits/Musc/musc-ambroisie.jpeg"
   },
   {
     "id": "musc-intime-premium",
     "name": "Musc Intime Premium",
     "category": "Musc",
-    "price": 6500,
-    "badge": "",
+    "price": 3500,
+    "badge": "L'unité",
     "image": "/Ihsane_fragrance/images/produits/Musc/musc-intime-premium.jpeg"
   }
 ]
