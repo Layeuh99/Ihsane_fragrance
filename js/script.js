@@ -11,6 +11,17 @@ const money = new Intl.NumberFormat("fr-FR", {
 const EXTERNAL_STORAGE_URL = localStorage.getItem('ihsane_storage_url') || '';
 const EXTERNAL_STORAGE_KEY = localStorage.getItem('ihsane_storage_key') || '';
 
+// Debug flag - set to false in production
+const DEBUG = true;
+
+function debugLog(...args) {
+  if (DEBUG) console.log(...args);
+}
+
+function debugError(...args) {
+  if (DEBUG) console.error(...args);
+}
+
 async function loadProductsFromJSON() {
   // Priorité 1: Stockage externe si configuré (JSONBin.io) - pour synchronisation entre utilisateurs
   if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
@@ -25,12 +36,12 @@ async function loadProductsFromJSON() {
         const products = data.record || data;
         if (Array.isArray(products) && products.length) {
           localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-          console.log('Produits chargés depuis le stockage externe');
+          debugLog('Produits chargés depuis le stockage externe');
           return products;
         }
       }
     } catch (error) {
-      console.log('Impossible de charger depuis le stockage externe');
+      debugLog('Impossible de charger depuis le stockage externe');
     }
   }
 
@@ -40,11 +51,11 @@ async function loadProductsFromJSON() {
     try {
       const products = JSON.parse(stored);
       if (Array.isArray(products) && products.length) {
-        console.log('Produits chargés depuis localStorage');
+        debugLog('Produits chargés depuis localStorage');
         return products;
       }
     } catch (e) {
-      console.error('Erreur lors de la lecture du localStorage:', e);
+      debugError('Erreur lors de la lecture du localStorage:', e);
     }
   }
 
@@ -55,16 +66,16 @@ async function loadProductsFromJSON() {
       const products = await response.json();
       if (Array.isArray(products) && products.length) {
         localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-        console.log('Produits chargés depuis products.json');
+        debugLog('Produits chargés depuis products.json');
         return products;
       }
     }
   } catch (error) {
-    console.log('Impossible de charger products.json');
+    debugLog('Impossible de charger products.json');
   }
 
   // Si aucune source n'a de données, retourner un tableau vide
-  console.log('Aucun produit trouvé, retour d\'un tableau vide');
+  debugLog('Aucun produit trouvé, retour d\'un tableau vide');
   return [];
 }
 
@@ -75,7 +86,7 @@ async function getProducts() {
 async function saveProducts(products) {
   // Sauvegarder dans le localStorage
   localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-  console.log('Produits sauvegardés dans le localStorage');
+  debugLog('Produits sauvegardés dans le localStorage');
 
   // Sauvegarder sur le stockage externe si configuré (JSONBin.io)
   if (EXTERNAL_STORAGE_URL && EXTERNAL_STORAGE_KEY) {
@@ -89,10 +100,10 @@ async function saveProducts(products) {
         body: JSON.stringify(products),
       });
       if (response.ok) {
-        console.log('Produits sauvegardés sur le stockage externe');
+        debugLog('Produits sauvegardés sur le stockage externe');
       }
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde sur le stockage externe:', error);
+      debugError('Erreur lors de la sauvegarde sur le stockage externe:', error);
     }
   }
 
@@ -178,16 +189,16 @@ function setMapLocation(mapKey) {
 
 async function renderProducts() {
   if (!productGrid) {
-    console.log('productGrid non trouvé - probablement sur la page admin');
+    debugLog('productGrid non trouvé - probablement sur la page admin');
     return;
   }
   const products = await getProducts();
-  console.log('Produits chargés:', products.length);
+  debugLog('Produits chargés:', products.length);
   const visibleProducts = activeFilter === "Tous"
     ? products
     : products.filter((product) => product.category === activeFilter);
 
-  console.log('Produits visibles:', visibleProducts.length);
+  debugLog('Produits visibles:', visibleProducts.length);
   productGrid.innerHTML = visibleProducts.map((product) => `
     <article class="product-card">
       ${product.badge ? `<span class="badge">${product.badge}</span>` : ""}
@@ -202,7 +213,7 @@ async function renderProducts() {
       </div>
     </article>
   `).join("");
-  console.log('HTML généré, longueur:', productGrid.innerHTML.length);
+  debugLog('HTML généré, longueur:', productGrid.innerHTML.length);
 }
 
 async function renderCart() {
@@ -314,9 +325,9 @@ if (document.readyState === 'loading') {
     initDOMElements();
     // Ne rendre les produits que si on est sur la page publique (pas admin)
     if (!document.body.classList.contains('admin-body')) {
-      console.log('Début du rendu des produits...');
+      debugLog('Début du rendu des produits...');
       await renderProducts();
-      console.log('Rendu des produits terminé');
+      debugLog('Rendu des produits terminé');
     }
     await renderCart();
   });
@@ -325,9 +336,9 @@ if (document.readyState === 'loading') {
     initDOMElements();
     // Ne rendre les produits que si on est sur la page publique (pas admin)
     if (!document.body.classList.contains('admin-body')) {
-      console.log('Début du rendu des produits...');
+      debugLog('Début du rendu des produits...');
       await renderProducts();
-      console.log('Rendu des produits terminé');
+      debugLog('Rendu des produits terminé');
     }
     await renderCart();
   })();
@@ -336,13 +347,13 @@ if (document.readyState === 'loading') {
 // Écouter les changements de localStorage pour synchroniser entre onglets
 window.addEventListener('storage', (event) => {
   if (event.key === PRODUCT_KEY && event.newValue) {
-    console.log('Changement détecté dans localStorage depuis un autre onglet');
+    debugLog('Changement détecté dans localStorage depuis un autre onglet');
     if (!document.body.classList.contains('admin-body')) {
       renderProducts();
     }
   }
   if (event.key === CART_KEY && event.newValue) {
-    console.log('Changement du panier détecté depuis un autre onglet');
+    debugLog('Changement du panier détecté depuis un autre onglet');
     renderCart();
   }
 });
