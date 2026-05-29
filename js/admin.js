@@ -4,16 +4,7 @@ let imageSource, urlField, uploadField, imageUrl, imageFile, imageHidden;
 
 const ADMIN_CREDENTIALS_KEY = "ihsane_fragrance_admin_credentials";
 
-// Debug flag - set to false in production
-const DEBUG = true;
-
-function debugLog(...args) {
-  if (DEBUG) console.log(...args);
-}
-
-function debugError(...args) {
-  if (DEBUG) console.error(...args);
-}
+// DEBUG and debug functions are defined in script.js
 
 function initAdminDOMElements() {
   adminProducts = document.querySelector("#adminProducts");
