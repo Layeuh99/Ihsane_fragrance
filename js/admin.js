@@ -212,279 +212,286 @@ async function renderAdminProducts() {
   `).join("");
 }
 
-if (loginForm) {
-  loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const data = new FormData(loginForm);
-    const email = data.get("email").trim();
-    const password = data.get("password");
+function initAdminEventListeners() {
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = new FormData(loginForm);
+      const email = data.get("email").trim();
+      const password = data.get("password");
 
-    if (!(await canLogin(email, password))) {
-      if (loginError) loginError.textContent = "Email ou mot de passe incorrect.";
-      return;
-    }
-
-    if (loginError) loginError.textContent = "";
-    loginForm.reset();
-    showAdmin(true);
-  });
-}
-
-if (logoutButton) {
-  logoutButton.addEventListener("click", () => {
-    showAdmin(false);
-  });
-}
-
-if (productForm) {
-  productForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const data = new FormData(productForm);
-    const name = data.get("name").trim();
-    const category = data.get("category");
-    const price = data.get("price");
-
-    // Charger les produits depuis localStorage
-    let products = loadProductsFromLocalStorage();
-
-    const submitButton = productForm.querySelector('button[type="submit"]');
-    const editingId = submitButton.dataset.editingId;
-
-    let imageUrl = data.get("imageUrl")?.trim() || "";
-    const imageSource = data.get("imageSource");
-    const originalImage = data.get("image");
-
-    if (imageSource === 'upload') {
-      const file = data.get("imageFile");
-      if (file && file.size > 0) {
-        try {
-          imageUrl = await fileToBase64(file);
-        } catch (error) {
-          debugError("Erreur lors de la conversion de l'image:", error);
-          alert("Erreur lors du chargement de l'image. Veuillez réessayer.");
-          return;
-        }
-      } else {
-        // Conserver l'image originale si pas de nouveau fichier
-        imageUrl = originalImage;
+      if (!(await canLogin(email, password))) {
+        if (loginError) loginError.textContent = "Email ou mot de passe incorrect.";
+        return;
       }
-    }
 
-    // Valider les données du produit
-    const validation = validateProductData(name, category, price, imageUrl);
-    if (!validation.valid) {
-      alert(validation.message);
-      return;
-    }
+      if (loginError) loginError.textContent = "";
+      loginForm.reset();
+      showAdmin(true);
+    });
+  }
 
-    if (editingId) {
-      // Mode édition : mettre à jour le produit existant
-      const productIndex = products.findIndex((p) => p.id === editingId);
-      if (productIndex !== -1) {
-        products[productIndex] = {
-          id: editingId,
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      showAdmin(false);
+    });
+  }
+
+  if (productForm) {
+    productForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = new FormData(productForm);
+      const name = data.get("name").trim();
+      const category = data.get("category");
+      const price = data.get("price");
+
+      // Charger les produits depuis localStorage
+      let products = loadProductsFromLocalStorage();
+
+      const submitButton = productForm.querySelector('button[type="submit"]');
+      const editingId = submitButton.dataset.editingId;
+
+      let imageUrl = data.get("imageUrl")?.trim() || "";
+      const imageSource = data.get("imageSource");
+      const originalImage = data.get("image");
+
+      if (imageSource === 'upload') {
+        const file = data.get("imageFile");
+        if (file && file.size > 0) {
+          try {
+            imageUrl = await fileToBase64(file);
+          } catch (error) {
+            debugError("Erreur lors de la conversion de l'image:", error);
+            alert("Erreur lors du chargement de l'image. Veuillez réessayer.");
+            return;
+          }
+        } else {
+          // Conserver l'image originale si pas de nouveau fichier
+          imageUrl = originalImage;
+        }
+      }
+
+      // Valider les données du produit
+      const validation = validateProductData(name, category, price, imageUrl);
+      if (!validation.valid) {
+        alert(validation.message);
+        return;
+      }
+
+      if (editingId) {
+        // Mode édition : mettre à jour le produit existant
+        const productIndex = products.findIndex((p) => p.id === editingId);
+        if (productIndex !== -1) {
+          products[productIndex] = {
+            id: editingId,
+            name,
+            category,
+            price: Number(price),
+            badge: data.get("badge").trim(),
+            image: imageUrl,
+          };
+        }
+        // Réinitialiser le bouton
+        submitButton.textContent = "Ajouter le produit";
+        delete submitButton.dataset.editingId;
+        if (cancelEdit) cancelEdit.hidden = true;
+      } else {
+        // Mode ajout : créer un nouveau produit
+        const id = `${slugify(name)}-${Date.now()}`;
+        products.unshift({
+          id,
           name,
           category,
           price: Number(price),
           badge: data.get("badge").trim(),
           image: imageUrl,
-        };
+        });
       }
-      // Réinitialiser le bouton
-      submitButton.textContent = "Ajouter le produit";
-      delete submitButton.dataset.editingId;
-      if (cancelEdit) cancelEdit.hidden = true;
-    } else {
-      // Mode ajout : créer un nouveau produit
-      const id = `${slugify(name)}-${Date.now()}`;
-      products.unshift({
-        id,
-        name,
-        category,
-        price: Number(price),
-        badge: data.get("badge").trim(),
-        image: imageUrl,
-      });
-    }
-
-    // Sauvegarder dans localStorage
-    localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-    debugLog('Produits sauvegardés dans localStorage');
-
-    // Sauvegarder sur le stockage externe si configuré
-    await saveToExternalStorage(products);
-
-    productForm.reset();
-    handleImageSourceChange();
-    await renderAdminProducts();
-  });
-}
-
-if (adminProducts) {
-  adminProducts.addEventListener("click", async (event) => {
-    const deleteButton = event.target.closest("[data-delete-product]");
-    const editButton = event.target.closest("[data-edit-product]");
-
-    if (deleteButton) {
-      // Charger les produits depuis localStorage
-      let products = loadProductsFromLocalStorage();
-      products = products.filter((product) => product.id !== deleteButton.dataset.deleteProduct);
-      localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-      debugLog('Produit supprimé, sauvegardé dans localStorage');
-
-      // Sauvegarder sur le stockage externe si configuré
-      await saveToExternalStorage(products);
-
-      await renderAdminProducts();
-    }
-
-    if (editButton) {
-      const productId = editButton.dataset.editProduct;
-      // Charger les produits depuis localStorage
-      let products = loadProductsFromLocalStorage();
-      const product = products.find((p) => p.id === productId);
-      if (!product) return;
-
-      // Remplir le formulaire avec les données du produit
-      if (productForm) {
-        productForm.querySelector('[name="name"]').value = product.name;
-        productForm.querySelector('[name="category"]').value = product.category;
-        productForm.querySelector('[name="price"]').value = product.price;
-        productForm.querySelector('[name="badge"]').value = product.badge || "";
-
-        // Gérer l'image
-        if (product.image.startsWith('data:')) {
-          productForm.querySelector('[name="imageSource"]').value = 'upload';
-          productForm.querySelector('#urlField').hidden = true;
-          productForm.querySelector('#uploadField').hidden = false;
-          productForm.querySelector('#imageUrl').required = false;
-          productForm.querySelector('#imageFile').required = false;
-        } else {
-          productForm.querySelector('[name="imageSource"]').value = 'url';
-          productForm.querySelector('[name="imageUrl"]').value = product.image;
-          productForm.querySelector('#urlField').hidden = false;
-          productForm.querySelector('#uploadField').hidden = true;
-          productForm.querySelector('#imageUrl').required = true;
-          productForm.querySelector('#imageFile').required = false;
-        }
-
-        // Changer le bouton submit pour "Mettre à jour"
-        const submitButton = productForm.querySelector('button[type="submit"]');
-        submitButton.textContent = "Mettre à jour le produit";
-        submitButton.dataset.editingId = productId;
-
-        // Afficher le bouton annuler
-        if (cancelEdit) cancelEdit.hidden = false;
-
-        // Stocker l'image originale
-        productForm.querySelector('#imageHidden').value = product.image;
-      }
-    }
-  });
-}
-
-
-if (cancelEdit) {
-  cancelEdit.addEventListener("click", () => {
-    productForm.reset();
-    handleImageSourceChange();
-    const submitButton = productForm.querySelector('button[type="submit"]');
-    submitButton.textContent = "Ajouter le produit";
-    delete submitButton.dataset.editingId;
-    cancelEdit.hidden = true;
-  });
-}
-
-// Export JSON
-if (exportJSON) {
-  exportJSON.addEventListener("click", async () => {
-    // Charger les produits depuis localStorage
-    let products = loadProductsFromLocalStorage();
-    const dataStr = JSON.stringify(products, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "products.json";
-    link.click();
-    URL.revokeObjectURL(url);
-  });
-}
-
-// Import JSON
-if (importJSON && importFile) {
-  importJSON.addEventListener("click", () => {
-    importFile.click();
-  });
-
-  importFile.addEventListener("change", async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const products = JSON.parse(text);
-      if (!Array.isArray(products)) throw new Error("Format invalide");
 
       // Sauvegarder dans localStorage
       localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
-      debugLog('Produits importés, sauvegardés dans localStorage');
+      debugLog('Produits sauvegardés dans localStorage');
 
       // Sauvegarder sur le stockage externe si configuré
       await saveToExternalStorage(products);
 
+      productForm.reset();
+      handleImageSourceChange();
       await renderAdminProducts();
-      alert("Produits importés avec succès !");
-    } catch (error) {
-      alert("Erreur lors de l'import : " + error.message);
-    }
+    });
+  }
 
-    importFile.value = "";
-  });
-}
+  if (adminProducts) {
+    adminProducts.addEventListener("click", async (event) => {
+      const deleteButton = event.target.closest("[data-delete-product]");
+      const editButton = event.target.closest("[data-edit-product]");
 
-// Configuration du stockage externe
-if (storageConfigForm) {
-  // Charger la configuration existante
-  const existingUrl = localStorage.getItem('ihsane_storage_url');
-  const existingKey = localStorage.getItem('ihsane_storage_key');
-  if (existingUrl) storageConfigForm.querySelector('[name="storageUrl"]').value = existingUrl;
-  if (existingKey) storageConfigForm.querySelector('[name="storageKey"]').value = existingKey;
+      if (deleteButton) {
+        // Charger les produits depuis localStorage
+        let products = loadProductsFromLocalStorage();
+        products = products.filter((product) => product.id !== deleteButton.dataset.deleteProduct);
+        localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+        debugLog('Produit supprimé, sauvegardé dans localStorage');
 
-  storageConfigForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(storageConfigForm);
-    const url = data.get("storageUrl").trim();
-    const key = data.get("storageKey").trim();
+        // Sauvegarder sur le stockage externe si configuré
+        await saveToExternalStorage(products);
 
-    localStorage.setItem('ihsane_storage_url', url);
-    localStorage.setItem('ihsane_storage_key', key);
+        await renderAdminProducts();
+      }
 
-    alert("Configuration sauvegardée ! Rechargez la page pour appliquer les changements.");
-  });
-}
+      if (editButton) {
+        const productId = editButton.dataset.editProduct;
+        // Charger les produits depuis localStorage
+        let products = loadProductsFromLocalStorage();
+        const product = products.find((p) => p.id === productId);
+        if (!product) return;
 
-if (clearStorageConfig) {
-  clearStorageConfig.addEventListener("click", () => {
-    localStorage.removeItem('ihsane_storage_url');
-    localStorage.removeItem('ihsane_storage_key');
-    if (storageConfigForm) {
-      storageConfigForm.querySelector('[name="storageUrl"]').value = '';
-      storageConfigForm.querySelector('[name="storageKey"]').value = '';
-    }
-    alert("Configuration effacée ! Rechargez la page pour appliquer les changements.");
-  });
+        // Remplir le formulaire avec les données du produit
+        if (productForm) {
+          productForm.querySelector('[name="name"]').value = product.name;
+          productForm.querySelector('[name="category"]').value = product.category;
+          productForm.querySelector('[name="price"]').value = product.price;
+          productForm.querySelector('[name="badge"]').value = product.badge || "";
+
+          // Gérer l'image
+          if (product.image.startsWith('data:')) {
+            productForm.querySelector('[name="imageSource"]').value = 'upload';
+            productForm.querySelector('#urlField').hidden = true;
+            productForm.querySelector('#uploadField').hidden = false;
+            productForm.querySelector('#imageUrl').required = false;
+            productForm.querySelector('#imageFile').required = false;
+          } else {
+            productForm.querySelector('[name="imageSource"]').value = 'url';
+            productForm.querySelector('[name="imageUrl"]').value = product.image;
+            productForm.querySelector('#urlField').hidden = false;
+            productForm.querySelector('#uploadField').hidden = true;
+            productForm.querySelector('#imageUrl').required = true;
+            productForm.querySelector('#imageFile').required = false;
+          }
+
+          // Changer le bouton submit pour "Mettre à jour"
+          const submitButton = productForm.querySelector('button[type="submit"]');
+          submitButton.textContent = "Mettre à jour le produit";
+          submitButton.dataset.editingId = productId;
+
+          // Afficher le bouton annuler
+          if (cancelEdit) cancelEdit.hidden = false;
+
+          // Stocker l'image originale
+          productForm.querySelector('#imageHidden').value = product.image;
+        }
+      }
+    });
+  }
+
+  if (cancelEdit) {
+    cancelEdit.addEventListener("click", () => {
+      productForm.reset();
+      handleImageSourceChange();
+      const submitButton = productForm.querySelector('button[type="submit"]');
+      submitButton.textContent = "Ajouter le produit";
+      delete submitButton.dataset.editingId;
+      cancelEdit.hidden = true;
+    });
+  }
+
+  // Export JSON
+  if (exportJSON) {
+    exportJSON.addEventListener("click", async () => {
+      // Charger les produits depuis localStorage
+      let products = loadProductsFromLocalStorage();
+      const dataStr = JSON.stringify(products, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "products.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  // Import JSON
+  if (importJSON && importFile) {
+    importJSON.addEventListener("click", () => {
+      importFile.click();
+    });
+
+    importFile.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const products = JSON.parse(text);
+        if (!Array.isArray(products)) throw new Error("Format invalide");
+
+        // Sauvegarder dans localStorage
+        localStorage.setItem(PRODUCT_KEY, JSON.stringify(products));
+        debugLog('Produits importés, sauvegardés dans localStorage');
+
+        // Sauvegarder sur le stockage externe si configuré
+        await saveToExternalStorage(products);
+
+        await renderAdminProducts();
+        alert("Produits importés avec succès !");
+      } catch (error) {
+        alert("Erreur lors de l'import : " + error.message);
+      }
+
+      importFile.value = "";
+    });
+  }
+
+  // Configuration du stockage externe
+  if (storageConfigForm) {
+    // Charger la configuration existante
+    const existingUrl = localStorage.getItem('ihsane_storage_url');
+    const existingKey = localStorage.getItem('ihsane_storage_key');
+    if (existingUrl) storageConfigForm.querySelector('[name="storageUrl"]').value = existingUrl;
+    if (existingKey) storageConfigForm.querySelector('[name="storageKey"]').value = existingKey;
+
+    storageConfigForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(storageConfigForm);
+      const url = data.get("storageUrl").trim();
+      const key = data.get("storageKey").trim();
+
+      localStorage.setItem('ihsane_storage_url', url);
+      localStorage.setItem('ihsane_storage_key', key);
+
+      alert("Configuration sauvegardée ! Rechargez la page pour appliquer les changements.");
+    });
+  }
+
+  if (clearStorageConfig) {
+    clearStorageConfig.addEventListener("click", () => {
+      localStorage.removeItem('ihsane_storage_url');
+      localStorage.removeItem('ihsane_storage_key');
+      if (storageConfigForm) {
+        storageConfigForm.querySelector('[name="storageUrl"]').value = '';
+        storageConfigForm.querySelector('[name="storageKey"]').value = '';
+      }
+      alert("Configuration effacée ! Rechargez la page pour appliquer les changements.");
+    });
+  }
+
+  if (imageSource) {
+    imageSource.addEventListener("change", handleImageSourceChange);
+  }
 }
 
 if (document.readyState === 'loading') {
   document.addEventListener("DOMContentLoaded", () => {
     initAdminDOMElements();
+    initAdminEventListeners();
     showAdmin(false);
     initLoginInterface();
     handleImageSourceChange();
   });
 } else {
   initAdminDOMElements();
+  initAdminEventListeners();
   showAdmin(false);
   initLoginInterface();
   handleImageSourceChange();
